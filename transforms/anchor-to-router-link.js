@@ -39,7 +39,7 @@ module.exports = (file, api) => {
 			.body.unshift(
 				j.importDeclaration(
 					[j.importSpecifier(j.identifier('Link'))],
-					j.literal('@reach/router')
+					j.literal('react-router-dom')
 				)
 			);
 	}

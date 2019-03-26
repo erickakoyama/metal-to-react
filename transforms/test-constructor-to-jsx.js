@@ -15,7 +15,7 @@
  *
  */
 
-export default function transformer(file, api) {
+module.exports = (file, api) => {
 	const j = api.jscodeshift;
 	const root = j(file.source);
 
@@ -101,6 +101,8 @@ export default function transformer(file, api) {
 		});
 
 		if (usedTestRenderer) {
+			const hasReactImport = !!root.find(j.ImportDefaultSpecifier, {local: {name: 'React'}}).length;
+
 			root.find(j.Program).forEach(item => {
 				item.node.body = [
 					j.importDeclaration(
@@ -111,6 +113,10 @@ export default function transformer(file, api) {
 						],
 						j.literal('react-test-renderer')
 					),
+					!hasReactImport && j.importDeclaration(
+						[j.importDefaultSpecifier(j.identifier('React'))],
+						j.literal('react')
+					), 
 					...item.node.body
 				];
 			});
@@ -123,4 +129,4 @@ export default function transformer(file, api) {
 		quote: 'auto',
 		reuseWhitespace: false
 	});
-}
+};

@@ -22,19 +22,20 @@ const files = [
 ];
 
 async function run(file) {
-	const {stdout, stderr} = await exec(
-		'jscodeshift ' +
-			process.cwd() +
-			' -t ' +
-			path.join(__dirname, file) +
-			'.js --parser babel'
-	);
-	console.log(
-		stdout.replace(/(.|\W)*Results/, 'Results'),
-		'End Transform: ',
-		file.toUpperCase()
-	);
-	console.log('');
+	try {
+		const {stdout, stderr} = await exec(
+			'jscodeshift ' +
+				process.cwd() +
+				' -t ' +
+				path.join(__dirname, file) +
+				'.js --parser babel',
+			{maxBuffer: 1024 * 500}
+		);
+
+		// console.log(stdout);
+	} catch (err) {
+		console.log('error in run:', file.toUpperCase(), ':', err);
+	}
 }
 
 async function runAll() {
@@ -43,7 +44,11 @@ async function runAll() {
 	for (const file of files) {
 		console.log('Start Transform: ', file.toUpperCase());
 
-		await run(file);
+		try {
+			await run(file);
+		} catch (err) {
+			console.log('error in runAll for:', file.toUpperCase(), ':', err);
+		}
 	}
 
 	console.log('COMPLETE');
